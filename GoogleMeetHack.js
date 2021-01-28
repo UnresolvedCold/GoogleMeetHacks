@@ -28,20 +28,25 @@ class Lecture {
     this.joinDate = new Date(year, month - 1, day, hours, minutes);
   }
 
+  DelayLec(i = 1) {
+    this.joinDate.setHours(this.joinDate.getHours() + i);
+  }
+
   async AutoJoin() {
     if (this.joined == true) return;
 
-    var d = new Date();
-    if (d > this.joinDate) {
-      console.log("Joining Lecture");
-      this.joined = true;
-      await this.Join();
-      await this.AutoClose();
-      return;
-    }
+    while (1) {
+      var d = new Date();
+      if (d > this.joinDate) {
+        console.log("Joining Lecture");
+        this.joined = true;
+        await this.Join();
+        await this.AutoClose();
+        return;
+      }
 
-    await delay(2000);
-    this.AutoJoin();
+      await delay(2000);
+    }
   }
 
   async Join() {
@@ -69,6 +74,7 @@ class Lecture {
     if (this.GetNumberNow() < this.studentLimit) {
       closeBtn.click();
       this.joined = false;
+      return;
     }
   }
 
@@ -89,7 +95,8 @@ class Lecture {
   }
 
   async AutoClose() {
-    await delay(10 * 1000);
+    this.joined = true;
+    await delay(30 * 1000);
 
     var pannel = document.getElementsByClassName(
       MEET["ClassName"]["countMembers"]
@@ -112,5 +119,8 @@ class Lecture {
 }
 
 // Entry Point
-var L = new Lecture();
-L.AutoJoin();
+(function () {
+  var L = new Lecture();
+  L.AutoJoin();
+  console.log(L.joinDate);
+})();
